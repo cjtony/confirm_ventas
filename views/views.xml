@@ -1,0 +1,87 @@
+<odoo>
+  <data>
+
+    <!-- CREACION DE BOTON VALIDAR -->
+
+    <record id="validation_inherit" model="ir.ui.view">
+      <field name="name">sale.order.validation</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <data>
+          <xpath expr="//header/button[@name='print_quotation'][1]" position="after">
+            <button attrs="{'invisible':[('state','!=',('draft'))]}" name="action_validate" string="Validar" type="object" class="oe_highlight"/>
+          </xpath>
+          </data>
+      </field>
+    </record>
+    
+    <!-- CREACION DE BOTON APROBAR -->
+
+    <record id="validation_inherit_2" model="ir.ui.view">
+      <field name="name">sale.order.aprobation</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <data>
+          <xpath expr="//header/button[@name='preview_sale_order']" position="before">
+            <button attrs="{'invisible':[('state','!=',('to_validate'))]}" name="action_aprobe" string="Aprobar" type="object" class="oe_highlight"/>
+          </xpath>
+          </data>
+      </field>
+    </record>
+
+    <!-- CONFIGURACIONES A BOTONES -->
+
+    <record id="sale_order_confirmbtn" model="ir.ui.view">
+        <field name="name">sale.order.confirm</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                <attribute name="attrs">{'invisible':[('state','!=', ('to_approve'))]}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_quotation_send'][1]" position="attributes">
+                <attribute name="string">Enviar por Email</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="attributes">
+                <attribute name="states">draft,sent,sale,done,to_validate,to_approve</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AGREGANDO CAMPOS USUARIO VALIDATE, APROVE -->
+
+    <record id="sale_order_add_campos" model="ir.ui.view">
+      <field name="name">validations</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[@name='other_information']" position="before">
+          <page string="Aceptaciones" states="to_validate,to_approve">
+            <group>
+                <field name="pruebacampo" invisible="1"/>
+                <field name="user_validation" readonly="1" states="to_validate,to_approve"/>
+                <field name="user_approve" readonly="1" states="to_approve"/>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- AGREGANDO EL ESTATUS BAR -->
+    
+    <record id="sale_form_view" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+          <field name="state" position="replace">
+            <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale,to_validate,to_approve,done,cancel" statusbar_colors='{"invoice_except":"red","waiting_date":"blue"}'/>
+          </field>
+        </field>
+    </record>
+
+
+  </data>
+</odoo>
